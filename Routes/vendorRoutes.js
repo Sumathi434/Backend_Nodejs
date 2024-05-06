@@ -6,5 +6,5 @@ const router = express.Router()
 router.post("/register", vendorController.vendorRigester)
 router.post("/login", vendorController.vendorLogin)
 router.get("/all-vendors", vendorController.getAllvendors)
-router.get("/single-record/:id", vendorController.getVendorById)
+router.get("/single-vendor/:id", vendorController.getVendorById)
 module.exports = router

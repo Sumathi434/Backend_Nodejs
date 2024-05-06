@@ -42,18 +42,20 @@ const vendorLogin = async (req, res) => {
             expiresIn: "1h",
         });
 
+        const vendorId = vendor._id
+
         console.log("Login Successfully");
-        res.status(200).json({ message: "Login successfully", token });
+        res.status(200).json({ message: "Login successfully", token, vendorId });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
     }
 };
 
-const getAllvendors = async(req, res)=>{
+const getAllvendors = async (req, res) => {
     try {
         const vendors = await Vendor.find().populate('firm');
-        res.json({vendors})
+        res.json({ vendors })
 
     } catch (error) {
         console.error(error);
@@ -61,14 +63,23 @@ const getAllvendors = async(req, res)=>{
     }
 }
 
-const getVendorById = async(req, res)=>{
+const getVendorById = async (req, res) => {
     const vendorId = req.params.id
     try {
         const vendor = await Vendor.findById(vendorId).populate('firm');
-        if(!vendor){
-            return res.status(404).json({error:"Vendor not found"})
+        if (!vendor) {
+            return res.status(404).json({ error: "Vendor not found" })
         }
-        res.status(200).json({vendor})
+
+        if (!vendor.firm || vendor.firm.length === 0) {
+            return res.status(404).json({ error: "Vendor firm not found" });
+        }
+
+
+
+        const vendorFirmId = vendor.firm[0]._id;
+        res.status(200).json({ vendorId, vendorFirmId, vendor })
+        console.log(vendorId, vendorFirmId);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
@@ -76,4 +87,6 @@ const getVendorById = async(req, res)=>{
 
 }
 
-module.exports = { vendorRigester, vendorLogin , getAllvendors, getVendorById};
+
+
+module.exports = { vendorRigester, vendorLogin, getAllvendors, getVendorById };

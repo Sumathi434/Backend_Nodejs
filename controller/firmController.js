@@ -4,10 +4,10 @@ const multer = require("multer");
 const path = require("path");
 
 const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, 'uploads/');
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         cb(null, Date.now() + path.extname(file.originalname));
     }
 });
@@ -23,6 +23,10 @@ const addFirm = async (req, res) => {
             return res.status(404).json({ error: "Vendor not found" });
         }
 
+        if (vendor.firm.length > 0) {
+            res.status(400).json({ message: "Vendor can only have one firm" })
+        }
+
         const firm = new Firm({
             firmName,
             area,
@@ -33,13 +37,14 @@ const addFirm = async (req, res) => {
             vendor: vendor._id,
         });
 
-        
-       const savedFirm = await firm.save();
-       vendor.firm.push(savedFirm)
 
-       await vendor.save()
+        const savedFirm = await firm.save();
+        const firmId = savedFirm._id
+        vendor.firm.push(savedFirm)
 
-        return res.status(200).json({ message: "Firm added successfully" });
+        await vendor.save()
+
+        return res.status(200).json({ message: "Firm added successfully", firmId });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Internal server error" });
@@ -47,13 +52,13 @@ const addFirm = async (req, res) => {
 };
 
 
-const firmgetbyId = async(req, res)=>{
+const firmgetbyId = async (req, res) => {
     try {
         const firmId = req.params.firmId;
         const deleteFirm = await Firm.findByIdAndDelete(firmId)
 
-        if(!deleteFirm){
-            return res.status(404).json({error: "No firm found"})
+        if (!deleteFirm) {
+            return res.status(404).json({ error: "No firm found" })
         }
     } catch (error) {
         console.error(error);
@@ -61,4 +66,4 @@ const firmgetbyId = async(req, res)=>{
     }
 }
 
-module.exports = { addFirm: [upload.single('image'), addFirm], firmgetbyId};
+module.exports = { addFirm: [upload.single('image'), addFirm], firmgetbyId };
