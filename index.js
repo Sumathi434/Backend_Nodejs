@@ -8,7 +8,7 @@ const firmRoutes = require("./Routes/firmRoutes")
 const productRouters = require("./Routes/productRoutes")
 const cors = require("cors")
 const path = require("path")
-const PORT = 4000
+const PORT = process.env.PORT || 4000
 
 dotEnv.config()
 app.use(cors())
